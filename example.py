@@ -37,10 +37,9 @@ while 1:
 
 while 1:
     os.system('cls' if os.name == 'nt' else 'clear')
-    m.update()
     m.print()
     inp = input('Next Generation? [yes/no]')
     if inp == 'y' or inp == 'yes':
-        continue
+        m.update()
     else:
         exit(0)

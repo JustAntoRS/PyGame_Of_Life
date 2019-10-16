@@ -7,34 +7,38 @@ class Map(Cell):
     """
     def __init__(self, num_row, num_column):
         """
-        Constructor of Map class that given 2 numbers(num_row, num_column) creates a matrix of Cell objects where
-        the cell at position (0,0) of the matrix is the first element and the cell at position
-        (num_row - 1, num_column - 1) is the last element of the cell's matrix
+        Args:
+            num_row (int): The number of rows of the matrix
+            num_column (int): The number of columns of the matrix
         """
         if num_row <= 0 or num_column <= 0:
             raise Exception('Invalid parameters')
-        self.num_row = num_row
-        self.num_column= num_column
+        self._num_row = num_row
+        self._num_column= num_column
         # Creates a matrix of (num_row * num_column) Cells with dead state
-        self.map = [None] * num_row
+        self._map = [None] * num_row
         for i in range(num_row):
-                self.map[i] = [Cell() for j in range(num_column)]
+                self._map[i] = [Cell() for j in range(num_column)]
 
 
     def getCell(self, pos_row, pos_column):
         """
-        Method that return the Cell of the map in the position [pos_row][pos_column]
-        or returns None in case there are no Cell at position [pos_row][pos_column]
+        Args:
+            pos_row (int): represents the row where the desired Cell is
+            pos_columnn (int): represetns the column where the desired Cell is
+
+        Returns:
+            Cell: returns the Cell object at position [pos_row][pos_column] of the Cell's matrix
         """
-        if pos_row in range(0, self.num_row) and pos_column in range(0, self.num_column):
-            return self.map[pos_row][pos_column]
+        if pos_row in range(0, self._num_row) and pos_column in range(0, self._num_column):
+            return self._map[pos_row][pos_column]
 
 
     def print(self):
         """
         Method that print the map of Cells in a human readable way
         """
-        for row in self.map:
+        for row in self._map:
             for c in row:
                 if c.state == 'dead':
                     print('[ ]', end ='', flush = True)
@@ -45,21 +49,21 @@ class Map(Cell):
 
     def update(self):
         """
-        Method that updates the cell's map based on the next rules:
+        Method that updates the Cell's matrix based on the next rules:
             1.- Every dead cell with 3 alive neighbours is born
             2.- Every alive cell with more than 3 alive neighbours die
             3.- Every alive cell with less than 2 alive neigbours die
         """
-        oldMap = copy.deepcopy(self.map)
-        for i in range(self.num_row):
-            for j in range(self.num_column):
+        oldMap = copy.deepcopy(self._map)
+        for i in range(self._num_row):
+            for j in range(self._num_column):
                 c = oldMap[i][j]
                 neighbours = self.checkNeighbours(i, j)
                 if c.state == 'dead' and neighbours[0] == 3:
                     c.changeState()
                 elif c.state == 'alive' and (neighbours[0] > 3 or neighbours[0] < 2):
                     c.changeState()
-        self.map = copy.deepcopy(oldMap)
+        self._map = copy.deepcopy(oldMap)
 
 
 
