@@ -9,6 +9,8 @@ class Map():
         Args:
             num_row (int): The number of rows of the matrix
             num_column (int): The number of columns of the matrix
+        Raises:
+            ValueError: if num_row or num_column are less than or equal to 0
         """
         #Exception handling
         if num_row <= 0:
@@ -66,6 +68,9 @@ class Map():
 
         Returns:
             None: change the state of the cell, given it's position, on the matrix
+
+        Raises:
+            ValueError: if there's no Cell at position (pos_row, pos_column)
         """
         if pos_row in range(0,self._num_row) and pos_column in range(0,self._num_column):
             if self._map[pos_row][pos_column] == 0:
