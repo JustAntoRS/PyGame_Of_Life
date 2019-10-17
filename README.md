@@ -5,7 +5,7 @@ Welcome! This module provides the basic methods to simulate the [Conway's Game o
 Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 
 ## How to use
-All the available methods are documented and you can access then from the terminal by doing:
+All the available methods are documented and you can access them from the terminal by doing:
 ```
 from game_of_life.map import *
 help(Map)
