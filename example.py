@@ -32,7 +32,7 @@ while 1:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("INVALID FORMAT!")
     else:
-        m.getCell(int(cell[0]),int(cell[1])).changeState()
+        m.changeCellState(int(cell[0]),int(cell[1]))
         os.system('cls' if os.name == 'nt' else 'clear')
 
 while 1:

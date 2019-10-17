@@ -1,9 +1,8 @@
-from game_of_life.cell import Cell
 import copy
 
-class Map(Cell):
+class Map():
     """
-    Class that represents a matrix of n*m Cell
+    Class that represents a matrix of n*m Cells
     """
     def __init__(self, num_row, num_column):
         """
@@ -11,41 +10,135 @@ class Map(Cell):
             num_row (int): The number of rows of the matrix
             num_column (int): The number of columns of the matrix
         """
-        if num_row <= 0 or num_column <= 0:
-            raise Exception('Invalid parameters')
+        #Exception handling
+        if num_row <= 0:
+            raise ValueError('num_row is {} and should be greater than 0'.format(num_row))
+        if num_column <= 0:
+            raise ValueError('num_column is {} and should be greater than 0'.format(num_column))
+
         self._num_row = num_row
         self._num_column= num_column
-        # Creates a matrix of (num_row * num_column) Cells with dead state
+        # Creates a matrix of (num_row * num_column) int numbers:
+        #   0 -> the cell state is dead
+        #   1 -> the cell state is alive
         self._map = [None] * num_row
         for i in range(num_row):
-                self._map[i] = [Cell() for j in range(num_column)]
+                self._map[i] = [0 for j in range(num_column)]
 
 
-    def getCell(self, pos_row, pos_column):
+    def getCellState(self, pos_row, pos_column):
         """
         Args:
             pos_row (int): represents the row where the desired Cell is
             pos_columnn (int): represetns the column where the desired Cell is
 
         Returns:
-            Cell: returns the Cell object at position [pos_row][pos_column] of the Cell's matrix
+            str: If the cell exist return state of the cell at the given position
+                ('dead' or 'alive'), otherwise returns None
         """
         if pos_row in range(0, self._num_row) and pos_column in range(0, self._num_column):
-            return self._map[pos_row][pos_column]
-
+            c = self._map[pos_row][pos_column]
+            if c == 0:
+                return 'dead'
+            else:
+                return 'alive'
 
     def print(self):
         """
-        Method that print the map of Cells in a human readable way
+        Method that print the map of Cells in a human readable way:
+        [ ] -> means the cell state is: dead
+        [X] -> means the cell state is: alive
         """
         for row in self._map:
             for c in row:
-                if c.state == 'dead':
+                if c == 0:
                     print('[ ]', end ='', flush = True)
                 else:
                     print('[X]', end ='', flush = True)
             print('')
 
+
+    def changeCellState(self, pos_row, pos_column):
+        """
+        Args:
+            pos_row (int): row position of the desired cell
+            pos_column (int): column position of the desired cell
+
+        Returns:
+            None: change the state of the cell, given it's position, on the matrix
+        """
+        if pos_row in range(0,self._num_row) and pos_column in range(0,self._num_column):
+            if self._map[pos_row][pos_column] == 0:
+                self._map[pos_row][pos_column] = 1
+            else:
+                self._map[pos_row][pos_column] = 0
+        else:
+            raise ValueError('Cell at position ({},{}) does not exist'.format(pos_row, pos_column))
+
+
+    def checkNeighbours(self, pos_row, pos_column):
+        """
+        Args:
+            pos_row (int): row position of the desired cell
+            pos_column (int): column position of the desired cell
+
+        Returns:
+            int: The number of neighbouring cells that are alive
+
+         The Cells at the following positions are considered neighbours (if they exist)
+         from the cell at position i,j being i the row position and j the column position in the matrix:
+            1.- Cell at position i-1,j
+            2.- Cell at position i+1,j
+            3.- Cell at position i,j+1
+            4.- Cell at position i,j-1
+            5.- Cell at position i-1,j+1
+            6.- Cell at position i-1,j-1
+            7.- Cell at position i+1,j+1
+            8.- Cell at position i+1,j-1
+        """
+        neighbours = 0
+
+        # Up neighbour
+        up_n = self.getCellState(pos_row - 1, pos_column)
+        if up_n == 'alive':
+            neighbours += 1
+
+        # Down neighbour
+        down_n = self.getCellState(pos_row + 1, pos_column)
+        if down_n == 'alive':
+            neighbours += 1
+
+        # Rigth neigbour
+        rigth_n = self.getCellState(pos_row, pos_column + 1)
+        if rigth_n == 'alive':
+            neighbours += 1
+
+        # Left neighbour
+        left_n = self.getCellState(pos_row, pos_column - 1)
+        if left_n == 'alive':
+            neighbours += 1
+
+        # Up-rigth neigbour
+        up_rigth_n = self.getCellState(pos_row - 1, pos_column + 1)
+        if up_rigth_n == 'alive':
+            neighbours += 1
+
+        # Up-left neigbour
+        up_left_n = self.getCellState(pos_row - 1, pos_column - 1)
+        if up_left_n == 'alive':
+            neighbours += 1
+
+        # Down-rigth neigbour
+        down_rigth_n = self.getCellState(pos_row + 1, pos_column + 1)
+        if down_rigth_n == 'alive':
+            neighbours += 1
+
+        # Down-left neigbour
+        down_left_n = self.getCellState(pos_row + 1, pos_column - 1)
+        if down_left_n == 'alive':
+            neighbours += 1
+
+        return neighbours
 
     def update(self):
         """
@@ -59,88 +152,8 @@ class Map(Cell):
             for j in range(self._num_column):
                 c = oldMap[i][j]
                 neighbours = self.checkNeighbours(i, j)
-                if c.state == 'dead' and neighbours[0] == 3:
-                    c.changeState()
-                elif c.state == 'alive' and (neighbours[0] > 3 or neighbours[0] < 2):
-                    c.changeState()
+                if c == 0 and neighbours == 3:
+                    oldMap[i][j] = 1
+                elif c == 1 and (neighbours > 3 or neighbours < 2):
+                    oldMap[i][j] = 0
         self._map = copy.deepcopy(oldMap)
-
-
-
-    def checkNeighbours(self, pos_row, pos_column):
-        """
-        Method that given the row and column position of a Cell in the Map
-        returns a list with 2 integer elements:
-            0th position represents the number of alive neighbours
-            1st position represents the number of dead neighbours
-
-         The Cells at the following positions are considered neighbours (if they exist)
-         from the cell at position i,j being i the row position and j the column position in the matrix:
-            1.- Cell at position i-1,j
-            2.- Cell at position i+1,j
-            3.- Cell at position i,j+1
-            4.- Cell at position i,j-1
-            5.- Cell at position i-1,j+1
-            6.- Cell at position i-1,j-1
-            7.- Cell at position i+1,j+1
-            8.- Cell at position i+1,j-1
-        """
-        neighbours = [0,0] # 0th = number of alive neigbours
-                           # 1st = number of dead neigbours
-        if self.getCell(pos_row - 1,pos_column): # Up neighbour
-            up_n = self.getCell(pos_row - 1, pos_column)
-            if up_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row + 1, pos_column): # Down neighbour
-            down_n = self.getCell(pos_row + 1, pos_column)
-            if down_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row, pos_column + 1): # Rigth neighbour
-            rigth_n = self.getCell(pos_row, pos_column + 1)
-            if rigth_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row, pos_column - 1): # Left neighbour
-            left_n = self.getCell(pos_row, pos_column - 1)
-            if left_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row - 1, pos_column + 1): # Up rigth neighbour
-            up_rigth_n = self.getCell(pos_row - 1, pos_column + 1)
-            if up_rigth_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row - 1, pos_column - 1): # Up left neigbour
-            up_left_n = self.getCell(pos_row - 1, pos_column - 1)
-            if up_left_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row + 1, pos_column + 1): # Down rigth neighbour
-            down_rigth_n = self.getCell(pos_row + 1, pos_column + 1)
-            if down_rigth_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        if self.getCell(pos_row + 1, pos_column - 1): # Down left neighbour
-            down_left_n = self.getCell(pos_row + 1, pos_column - 1)
-            if down_left_n.state == 'dead':
-                neighbours[1] += 1
-            else:
-                neighbours[0] += 1
-
-        return neighbours
