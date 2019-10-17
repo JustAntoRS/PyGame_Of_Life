@@ -1,5 +1,5 @@
 import os
-from game_of_life.map import Map
+from game_of_life import *
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
