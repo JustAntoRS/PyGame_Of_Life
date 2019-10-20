@@ -152,13 +152,19 @@ class Map():
             2.- Every alive cell with more than 3 alive neighbours die
             3.- Every alive cell with less than 2 alive neigbours die
         """
-        oldMap = copy.deepcopy(self._map)
+
+        toChangeCells = [] # List to store the position of the cells to change their state
+
+        # Check which cells should change
         for i in range(self._num_row):
             for j in range(self._num_column):
-                c = oldMap[i][j]
+                c = self.getCellState(i, j)
                 neighbours = self.checkNeighbours(i, j)
-                if c == 0 and neighbours == 3:
-                    oldMap[i][j] = 1
-                elif c == 1 and (neighbours > 3 or neighbours < 2):
-                    oldMap[i][j] = 0
-        self._map = copy.deepcopy(oldMap)
+                if c == 'dead' and neighbours == 3:
+                    toChangeCells.append((i, j))
+                elif c == 'alive' and (neighbours > 3 or neighbours < 2):
+                    toChangeCells.append((i, j))
+
+        # Change cells state
+        for pos in toChangeCells:
+            self.changeCellState(pos[0], pos[1])
